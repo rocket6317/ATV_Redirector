@@ -1,11 +1,27 @@
 version: "3.9"
 
 services:
+  vpn:
+    image: qmcgaw/gluetun
+    container_name: nordvpn
+    cap_add:
+      - NET_ADMIN
+    env_file:
+      - stack.env   # credentials stored securely here
+    environment:
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${NORDVPN_USER}
+      - OPENVPN_PASSWORD=${NORDVPN_PASS}
+      - SERVER_COUNTRIES=Turkey
+    ports:
+      - "6288:6288"   # expose ATV redirector through VPN
+    restart: unless-stopped
+
   atv-redirector:
     build: .
     container_name: atv-redirector
+    network_mode: "service:vpn"   # share VPN network stack
+    depends_on:
+      - vpn
     restart: unless-stopped
-    ports:
-      - "6288:6288"
-    environment:
-      - PYTHONUNBUFFERED=1
