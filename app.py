@@ -1,22 +1,30 @@
-import yt_dlp
+import requests
+import re
 from flask import Flask, jsonify, redirect
 
 app = Flask(__name__)
 
-ATV_URL = "https://www.atv.com.tr/canli-yayin"
+ATV_PAGE = "https://www.atv.com.tr/canli-yayin"
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "Referer": "https://www.atv.com.tr/",
+    "Origin": "https://www.atv.com.tr",
+    "Accept": "*/*",
+}
 
 def resolve_atv_stream():
     """
-    Use yt-dlp to extract the current ATV stream URL.
+    Fetch ATV live page with browser-like headers and extract the .m3u8 link.
     """
-    ydl_opts = {"quiet": True, "skip_download": True}
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(ATV_URL, download=False)
-            return info.get("url")
+        resp = requests.get(ATV_PAGE, headers=HEADERS, timeout=10)
+        match = re.search(r'https://[^\s"]+\.m3u8[^\s"]*', resp.text)
+        if match:
+            return match.group(0)
     except Exception as e:
         print(f"Error resolving ATV stream: {e}")
-        return None
+    return None
 
 @app.route("/atv")
 def atv():
