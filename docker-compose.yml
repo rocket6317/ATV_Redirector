@@ -1,3 +1,4 @@
+# docker-compose.yml
 version: "3.9"
 
 services:
@@ -17,11 +18,17 @@ services:
     ports:
       - "6288:6288"
     restart: unless-stopped
+    # Optional: basic healthcheck to trigger auto-restarts
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "https://www.atv.com.tr/canli-yayin"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
 
   atv-redirector:
     build: .
     container_name: atv-redirector
-    network_mode: "service:vpn"
+    network_mode: "service:vpn"   # share VPN network stack
     depends_on:
       - vpn
     restart: unless-stopped
