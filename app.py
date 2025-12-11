@@ -11,7 +11,6 @@ def resolve_atv_stream():
     Fetch ATV live page and extract the .m3u8 link.
     """
     resp = requests.get(ATV_PAGE, headers={"User-Agent": "Mozilla/5.0"})
-    # Regex to find .m3u8 links
     match = re.search(r'https://[^\s"]+\.m3u8[^\s"]*', resp.text)
     if match:
         return match.group(0)
