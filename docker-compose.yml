@@ -7,7 +7,7 @@ services:
     cap_add:
       - NET_ADMIN
     env_file:
-      - stack.env   # credentials stored securely here
+      - stack.env
     environment:
       - VPN_SERVICE_PROVIDER=nordvpn
       - VPN_TYPE=openvpn
@@ -15,13 +15,13 @@ services:
       - OPENVPN_PASSWORD=${NORDVPN_PASS}
       - SERVER_COUNTRIES=Turkey
     ports:
-      - "6288:6288"   # expose ATV redirector through VPN
+      - "6288:6288"
     restart: unless-stopped
 
   atv-redirector:
     build: .
     container_name: atv-redirector
-    network_mode: "service:vpn"   # share VPN network stack
+    network_mode: "service:vpn"
     depends_on:
       - vpn
     restart: unless-stopped
