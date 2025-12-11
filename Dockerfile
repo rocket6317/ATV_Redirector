@@ -3,8 +3,8 @@ FROM python:3.13-slim
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install playwright \
+RUN apt-get update && apt-get install -y curl \
+    && pip install --no-cache-dir -r requirements.txt \
     && playwright install chromium
 
 COPY app.py .
