@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  atv-redirector:
+    build: .
+    container_name: atv-redirector
+    restart: unless-stopped
+    ports:
+      - "6288:6288"
+    environment:
+      - PYTHONUNBUFFERED=1
