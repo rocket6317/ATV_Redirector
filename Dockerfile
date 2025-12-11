@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.49.0-focal
+FROM playwright/python:v1.49.0-focal
 
 WORKDIR /app
 COPY requirements.txt .
