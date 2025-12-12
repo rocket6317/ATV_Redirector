@@ -14,14 +14,14 @@ services:
       - OPENVPN_PASSWORD=${NORDVPN_PASS}
       - SERVER_COUNTRIES=Turkey
     restart: unless-stopped
+    ports:
+      - "6288:6288"   # expose resolver’s port via Gluetun
 
   resolver:
     build: .
     depends_on:
       - gluetun
-    network_mode: "service:gluetun"   # <-- critical line
+    network_mode: "service:gluetun"   # resolver shares Gluetun’s network stack
     environment:
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-    ports:
-      - "6288:6288"
     restart: unless-stopped
