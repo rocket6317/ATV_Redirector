@@ -36,7 +36,7 @@ def get_atv_url():
         page.goto(ATV_URL, timeout=60000)
 
         # Allow time for player to initialize and request playlists
-        page.wait_for_timeout(25000)
+        page.wait_for_timeout(60000)  # now 60 seconds
 
         browser.close()
 
