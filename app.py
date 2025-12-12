@@ -9,7 +9,6 @@ def atv():
     if not stream_url:
         return Response("No 1080p stream URL found", status=404)
 
-    # Build M3U content with full untrimmed URL
     m3u_content = f"""#EXTM3U
 #EXTINF:-1, ATV Live (1080p)
 {stream_url}
