@@ -1,6 +1,7 @@
-# Use the official Playwright base image (includes Chromium, codecs, fonts, dependencies)
+# Use the official Playwright base image (includes Chromium, codecs, and dependencies)
 FROM mcr.microsoft.com/playwright/python:v1.49.0
 
+# Set working directory
 WORKDIR /app
 
 # Copy requirements and install Python dependencies
