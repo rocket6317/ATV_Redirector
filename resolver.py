@@ -24,11 +24,7 @@ def get_atv_url():
                 url = resp.url
                 status = resp.status
                 print(f"[resolver] Finished: {url} (status {status})")
-                if (
-                    ".m3u8" in url
-                    and "st=" in url
-                    and "e=" in url
-                ):
+                if ".m3u8" in url and "st=" in url and "e=" in url:
                     nonlocal final_url
                     final_url = url
                     print("[resolver] >>> Captured signed stream URL:", final_url)
@@ -48,6 +44,8 @@ def get_atv_url():
 
         if not final_url:
             print("[resolver] No signed m3u8 URL captured after timeout")
+        return final_url  # <-- important for app.py
 
 if __name__ == "__main__":
-    get_atv_url()
+    url = get_atv_url()
+    print("Returned URL:", url)
