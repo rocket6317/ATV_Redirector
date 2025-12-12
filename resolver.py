@@ -4,8 +4,8 @@ ATV_URL = "https://www.atv.com.tr/canli-yayin"
 
 def get_atv_url():
     with sync_playwright() as p:
-        # Use headless=False if you want to replicate your working script exactly.
-        browser = p.chromium.launch(headless=False, args=["--no-sandbox", "--disable-dev-shm-usage"])
+        # Use headless=False if you want identical behaviour to your working script.
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
         context = browser.new_context()
         page = context.new_page()
 
@@ -18,7 +18,7 @@ def get_atv_url():
                 if not resp:
                     return
                 url = resp.url
-                # Same conditions as your working script
+                # Match your working script’s conditions
                 if (
                     ".m3u8" in url
                     and "atv_" in url
@@ -27,8 +27,8 @@ def get_atv_url():
                 ):
                     final_url = url
                     print("[resolver] >>> Final stream URL:", final_url)
-            except Exception:
-                pass
+            except Exception as e:
+                print("[resolver] Error:", e)
 
         page.on("requestfinished", on_request_finished)
 
