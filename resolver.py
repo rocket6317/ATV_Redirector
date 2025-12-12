@@ -4,26 +4,36 @@ ATV_URL = "https://www.atv.com.tr/canli-yayin"
 
 def get_atv_url():
     with sync_playwright() as p:
-        # headless=True for container use; set False if you want to see the browser
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context()
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--use-gl=swiftshader",
+                "--autoplay-policy=no-user-gesture-required",
+                "--disable-blink-features=AutomationControlled"
+            ]
+        )
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+            viewport={"width": 1920, "height": 1080}
+        )
         page = context.new_page()
 
         final_url = None
 
         # Log every request
-        def on_request(request):
-            print(f"[resolver] Request: {request.method} {request.url}")
+        page.on("request", lambda req: print(f"[resolver] Request: {req.method} {req.url}"))
+        page.on("response", lambda resp: print(f"[resolver] Response: {resp.url} status={resp.status}"))
 
-        # Log finished requests and capture signed m3u8
         def on_request_finished(request):
             try:
                 resp = request.response()
                 if not resp:
                     return
                 url = resp.url
-                status = resp.status
-                print(f"[resolver] Finished: {url} (status {status})")
                 if ".m3u8" in url and "st=" in url and "e=" in url:
                     nonlocal final_url
                     final_url = url
@@ -31,7 +41,6 @@ def get_atv_url():
             except Exception as e:
                 print("[resolver] Error inspecting request:", e)
 
-        page.on("request", on_request)
         page.on("requestfinished", on_request_finished)
 
         print("[resolver] Navigating to", ATV_URL)
@@ -44,7 +53,7 @@ def get_atv_url():
 
         if not final_url:
             print("[resolver] No signed m3u8 URL captured after timeout")
-        return final_url  # <-- important for app.py
+        return final_url
 
 if __name__ == "__main__":
     url = get_atv_url()
