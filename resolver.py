@@ -58,7 +58,7 @@ def get_atv_urls():
         page.on("requestfinished", on_request_finished)
 
         print("[resolver] Navigating to", ATV_URL)
-        page.goto(ATV_URL, timeout=60000)
+        page.goto(ATV_URL, timeout=60000, wait_until="domcontentloaded")
 
         page.wait_for_timeout(40000)
         browser.close()
@@ -66,7 +66,3 @@ def get_atv_urls():
         if not urls:
             print("[resolver] No m3u8 URLs captured after timeout")
         return urls
-
-if __name__ == "__main__":
-    urls = get_atv_urls()
-    print("Returned URLs:", urls)
