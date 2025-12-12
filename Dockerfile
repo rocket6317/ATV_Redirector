@@ -7,10 +7,15 @@ RUN apt-get update && apt-get install -y \
     libxrandr2 libgbm1 libasound2 libxshmfence1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Set Playwright browser path before install
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
-    && python -m playwright install chromium
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Chromium into /ms-playwright
+RUN python -m playwright install chromium
 
 # Copy app code
 COPY . /app
