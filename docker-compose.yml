@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   resolver:
-    build: ./resolver
+    build: .
     depends_on:
       - nordvpn
     network_mode: "service:nordvpn"   # route all traffic through VPN
