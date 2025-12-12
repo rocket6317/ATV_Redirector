@@ -5,7 +5,7 @@ networks:
 
 services:
   nordvpn:
-    image: bubuntux/nordvpn
+    image: bubuntux/nordvpn:latest
     cap_add:
       - NET_ADMIN
       - NET_RAW
