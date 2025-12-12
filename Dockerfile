@@ -1,5 +1,5 @@
 # Use the official Playwright base image (includes Chromium, codecs, and dependencies)
-FROM mcr.microsoft.com/playwright/python:v1.49.0-focal
+FROM mcr.microsoft.com/playwright/python:v1.49.0
 
 # Set working directory
 WORKDIR /app
