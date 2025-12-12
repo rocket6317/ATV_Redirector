@@ -4,10 +4,9 @@ ATV_URL = "https://www.atv.com.tr/canli-yayin"
 
 def get_atv_url():
     with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,  # try False if still no URL
-            args=["--no-sandbox", "--disable-dev-shm-usage"]
-        )
+        # Use headless=False if you want to replicate your working script exactly.
+        # In Docker you can keep headless=True, but try False with Xvfb if needed.
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
         context = browser.new_context()
         page = context.new_page()
 
@@ -20,22 +19,28 @@ def get_atv_url():
                 if not resp:
                     return
                 url = resp.url
-                if ".m3u8" in url:
-                    print("[resolver] >>> Captured m3u8:", url)
-                    if "1080p" in url:
-                        final_url = url
+                # Match the same conditions you used in your standalone script
+                if (
+                    ".m3u8" in url
+                    and "atv_" in url
+                    and "st=" in url
+                    and "e=" in url
+                ):
+                    final_url = url
+                    print("[resolver] >>> Final stream URL:", final_url)
             except Exception:
                 pass
 
         page.on("requestfinished", on_request_finished)
 
         print("[resolver] Navigating to", ATV_URL)
-        page.goto(ATV_URL, timeout=60000, wait_until="domcontentloaded")
+        page.goto(ATV_URL, timeout=60000)
 
-        page.wait_for_timeout(25000)  # give player time
+        # Allow time for player to initialize and request playlists
+        page.wait_for_timeout(25000)
 
         browser.close()
 
         if not final_url:
-            print("[resolver] No 1080p m3u8 URL captured")
+            print("[resolver] No signed CDN stream URL captured")
         return final_url
