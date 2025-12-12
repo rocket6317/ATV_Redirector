@@ -14,16 +14,17 @@ services:
       - OPENVPN_PASSWORD=${NORDVPN_PASS}
       - SERVER_COUNTRIES=Turkey
       - DOT=off
-      - DNS=1.1.1.1,1.0.0.1   # Cloudflare DNS for consistency
+      - DNS=1.1.1.1,1.0.0.1
     restart: unless-stopped
     ports:
-      - "6288:6288"   # expose resolver’s port via Gluetun
+      - "6288:6288"
 
   resolver:
     build: .
     depends_on:
       - gluetun
-    network_mode: "service:gluetun"   # resolver shares Gluetun’s network stack
+    network_mode: "service:gluetun"
     environment:
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+    shm_size: "1gb"   # <-- added here
     restart: unless-stopped
