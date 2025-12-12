@@ -1,22 +1,15 @@
-FROM python:3.10-slim
+# Use the official Playwright base image (includes Chromium, codecs, and dependencies)
+FROM mcr.microsoft.com/playwright/python:v1.49.0-focal
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    wget \
-    curl \
-    xvfb \
-    chromium \
-    chromium-codecs-ffmpeg-extra \
-    && rm -rf /var/lib/apt/lists/*
+# Set working directory
+WORKDIR /app
 
-# Install Python dependencies
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Playwright and browsers
-RUN pip install playwright && playwright install chromium
-
-WORKDIR /app
+# Copy application code
 COPY . .
 
+# Expose port (served via Gunicorn)
 CMD ["gunicorn", "-b", "0.0.0.0:6288", "app:app"]
