@@ -12,7 +12,7 @@ def clean_url(url: str) -> str:
     new_query = urlencode(qs, doseq=True)
     return urlunparse(parsed._replace(query=new_query))
 
-def get_atv_url():
+def get_atv_urls():
     with sync_playwright() as p:
         browser = p.chromium.launch(
             headless=True,
@@ -40,7 +40,7 @@ def get_atv_url():
         )
         page = context.new_page()
 
-        final_url = None
+        urls = []
 
         def on_request_finished(request):
             try:
@@ -48,14 +48,10 @@ def get_atv_url():
                 if not resp:
                     return
                 url = resp.url
-                # Only log .m3u8 files
                 if ".m3u8" in url:
-                    # Specifically filter for 1080p variant
-                    if "1080p" in url:
-                        cleaned = clean_url(url)
-                        nonlocal final_url
-                        final_url = cleaned
-                        print("[resolver] >>> Captured 1080p stream URL:", cleaned)
+                    cleaned = clean_url(url)
+                    urls.append(cleaned)
+                    print("[resolver] >>> Captured m3u8 stream URL:", cleaned)
             except Exception as e:
                 print("[resolver] Error inspecting request:", e)
 
@@ -67,10 +63,10 @@ def get_atv_url():
         page.wait_for_timeout(40000)
         browser.close()
 
-        if not final_url:
-            print("[resolver] No 1080p m3u8 URL captured after timeout")
-        return final_url
+        if not urls:
+            print("[resolver] No m3u8 URLs captured after timeout")
+        return urls
 
 if __name__ == "__main__":
-    url = get_atv_url()
-    print("Returned URL:", url)
+    urls = get_atv_urls()
+    print("Returned URLs:", urls)
