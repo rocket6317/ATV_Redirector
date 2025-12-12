@@ -4,8 +4,8 @@ ATV_URL = "https://www.atv.com.tr/canli-yayin"
 
 def get_atv_url():
     with sync_playwright() as p:
-        # Use headless=False if you want identical behaviour to your working script.
-        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
+        # Non-headless mode to replicate your working script
+        browser = p.chromium.launch(headless=False, args=["--no-sandbox", "--disable-dev-shm-usage"])
         context = browser.new_context()
         page = context.new_page()
 
@@ -18,7 +18,6 @@ def get_atv_url():
                 if not resp:
                     return
                 url = resp.url
-                # Match your working script’s conditions
                 if (
                     ".m3u8" in url
                     and "atv_" in url
@@ -36,7 +35,7 @@ def get_atv_url():
         page.goto(ATV_URL, timeout=60000)
 
         # Allow time for player to initialize and request playlists
-        page.wait_for_timeout(60000)  # now 60 seconds
+        page.wait_for_timeout(60000)  # 60 seconds
 
         browser.close()
 
