@@ -1,6 +1,16 @@
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from playwright.sync_api import sync_playwright
 
 ATV_URL = "https://www.atv.com.tr/canli-yayin"
+
+def clean_url(url: str) -> str:
+    """Remove &app=... and &ce=... from query string."""
+    parsed = urlparse(url)
+    qs = parse_qs(parsed.query)
+    qs.pop("app", None)
+    qs.pop("ce", None)
+    new_query = urlencode(qs, doseq=True)
+    return urlunparse(parsed._replace(query=new_query))
 
 def get_atv_url():
     with sync_playwright() as p:
@@ -32,19 +42,20 @@ def get_atv_url():
 
         final_url = None
 
-        page.on("request", lambda req: print(f"[resolver] Request: {req.method} {req.url}"))
-        page.on("response", lambda resp: print(f"[resolver] Response: {resp.url} status={resp.status}"))
-
         def on_request_finished(request):
             try:
                 resp = request.response()
                 if not resp:
                     return
                 url = resp.url
-                if ".m3u8" in url and "st=" in url and "e=" in url:
-                    nonlocal final_url
-                    final_url = url
-                    print("[resolver] >>> Captured signed stream URL:", final_url)
+                # Only log .m3u8 files
+                if ".m3u8" in url:
+                    # Specifically filter for 1080p variant
+                    if "1080p" in url:
+                        cleaned = clean_url(url)
+                        nonlocal final_url
+                        final_url = cleaned
+                        print("[resolver] >>> Captured 1080p stream URL:", cleaned)
             except Exception as e:
                 print("[resolver] Error inspecting request:", e)
 
@@ -57,7 +68,7 @@ def get_atv_url():
         browser.close()
 
         if not final_url:
-            print("[resolver] No signed m3u8 URL captured after timeout")
+            print("[resolver] No 1080p m3u8 URL captured after timeout")
         return final_url
 
 if __name__ == "__main__":
