@@ -1,18 +1,8 @@
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from playwright.sync_api import sync_playwright
 
 ATV_URL = "https://www.atv.com.tr/canli-yayin"
 
-def clean_url(url: str) -> str:
-    """Remove &app=... and &ce=... from query string."""
-    parsed = urlparse(url)
-    qs = parse_qs(parsed.query)
-    qs.pop("app", None)
-    qs.pop("ce", None)
-    new_query = urlencode(qs, doseq=True)
-    return urlunparse(parsed._replace(query=new_query))
-
-def get_atv_urls():
+def get_atv_url():
     with sync_playwright() as p:
         browser = p.chromium.launch(
             headless=True,
@@ -40,7 +30,11 @@ def get_atv_urls():
         )
         page = context.new_page()
 
-        urls = []
+        final_url = None
+
+        # Log all requests and responses
+        page.on("request", lambda req: print(f"[resolver] Request: {req.method} {req.url}"))
+        page.on("response", lambda resp: print(f"[resolver] Response: {resp.url} status={resp.status}"))
 
         def on_request_finished(request):
             try:
@@ -49,9 +43,12 @@ def get_atv_urls():
                     return
                 url = resp.url
                 if ".m3u8" in url:
-                    cleaned = clean_url(url)
-                    urls.append(cleaned)
-                    print("[resolver] >>> Captured m3u8 stream URL:", cleaned)
+                    print("[resolver] >>> Captured m3u8 stream URL:", url)
+                    # Prefer 1080p link
+                    if "1080p" in url:
+                        nonlocal final_url
+                        final_url = url
+                        print("[resolver] >>> Selected 1080p stream URL:", final_url)
             except Exception as e:
                 print("[resolver] Error inspecting request:", e)
 
@@ -63,6 +60,6 @@ def get_atv_urls():
         page.wait_for_timeout(40000)
         browser.close()
 
-        if not urls:
-            print("[resolver] No m3u8 URLs captured after timeout")
-        return urls
+        if not final_url:
+            print("[resolver] No 1080p m3u8 URL captured after timeout")
+        return final_url
