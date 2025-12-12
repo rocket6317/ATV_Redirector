@@ -1,20 +1,17 @@
 from flask import Flask, Response
-from resolver import get_atv_urls
+from resolver import get_atv_url
 
 app = Flask(__name__)
 
 @app.route("/atv")
 def atv():
-    urls = get_atv_urls()
-    if not urls:
-        return Response("No stream URLs found", status=404)
+    stream_url = get_atv_url()
+    if not stream_url:
+        return Response("No 1080p stream URL found", status=404)
 
-    # Use the last captured URL (most recent)
-    stream_url = urls[-1]
-
-    # Build M3U content
+    # Build M3U content with full untrimmed URL
     m3u_content = f"""#EXTM3U
-#EXTINF:-1, ATV Live
+#EXTINF:-1, ATV Live (1080p)
 {stream_url}
 """
 
