@@ -21,13 +21,17 @@ def get_atv_url():
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/120.0.0.0 Safari/537.36"
             ),
-            viewport={"width": 1920, "height": 1080}
+            viewport={"width": 1920, "height": 1080},
+            extra_http_headers={
+                "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Referer": "https://www.atv.com.tr/",
+                "Origin": "https://www.atv.com.tr"
+            }
         )
         page = context.new_page()
 
         final_url = None
 
-        # Log every request and response
         page.on("request", lambda req: print(f"[resolver] Request: {req.method} {req.url}"))
         page.on("response", lambda resp: print(f"[resolver] Response: {resp.url} status={resp.status}"))
 
@@ -49,9 +53,7 @@ def get_atv_url():
         print("[resolver] Navigating to", ATV_URL)
         page.goto(ATV_URL, timeout=60000)
 
-        # Allow time for player to initialise and request playlists
         page.wait_for_timeout(40000)
-
         browser.close()
 
         if not final_url:
