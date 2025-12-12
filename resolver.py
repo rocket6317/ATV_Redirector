@@ -5,8 +5,7 @@ ATV_URL = "https://www.atv.com.tr/canli-yayin"
 def get_atv_url():
     with sync_playwright() as p:
         # Use headless=False if you want to replicate your working script exactly.
-        # In Docker you can keep headless=True, but try False with Xvfb if needed.
-        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
+        browser = p.chromium.launch(headless=False, args=["--no-sandbox", "--disable-dev-shm-usage"])
         context = browser.new_context()
         page = context.new_page()
 
@@ -19,7 +18,7 @@ def get_atv_url():
                 if not resp:
                     return
                 url = resp.url
-                # Match the same conditions you used in your standalone script
+                # Same conditions as your working script
                 if (
                     ".m3u8" in url
                     and "atv_" in url
