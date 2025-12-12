@@ -1,32 +1,26 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  vpn:
-    image: qmcgaw/gluetun
-    container_name: nordvpn
+  nordvpn:
+    image: bubuntux/nordvpn
     cap_add:
       - NET_ADMIN
-    env_file:
-      - stack.env
     environment:
-      - VPN_SERVICE_PROVIDER=nordvpn
-      - VPN_TYPE=openvpn
-      - OPENVPN_USER=${NORDVPN_USER}
-      - OPENVPN_PASSWORD=${NORDVPN_PASS}
-      - SERVER_COUNTRIES=Turkey
+      - USER=${NORDVPN_USER}
+      - PASS=${NORDVPN_PASS}
+      - CONNECT=Turkey
+      - TECHNOLOGY=NordLynx
+    devices:
+      - /dev/net/tun
+    restart: unless-stopped
+
+  resolver:
+    build: ./resolver
+    depends_on:
+      - nordvpn
+    network_mode: "service:nordvpn"   # route all traffic through VPN
+    environment:
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
     ports:
       - "6288:6288"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "https://www.atv.com.tr/canli-yayin"]
-      interval: 60s
-      timeout: 10s
-      retries: 3
-
-  atv-redirector:
-    build: .
-    container_name: atv-redirector
-    network_mode: "service:vpn"
-    depends_on:
-      - vpn
     restart: unless-stopped
