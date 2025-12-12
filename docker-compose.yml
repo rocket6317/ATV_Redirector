@@ -13,6 +13,8 @@ services:
       - OPENVPN_USER=${NORDVPN_USER}
       - OPENVPN_PASSWORD=${NORDVPN_PASS}
       - SERVER_COUNTRIES=Turkey
+      - DOT=off
+      - DNS=1.1.1.1,1.0.0.1   # Cloudflare DNS for consistency
     restart: unless-stopped
     ports:
       - "6288:6288"   # expose resolver’s port via Gluetun
