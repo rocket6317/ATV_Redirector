@@ -26,5 +26,5 @@ services:
     network_mode: "service:gluetun"
     environment:
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-    shm_size: "1gb"   # prevent Chromium crashes
+    shm_size: "1gb"
     restart: unless-stopped
