@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   nordvpn:
     image: bubuntux/nordvpn
@@ -13,14 +11,14 @@ services:
     devices:
       - /dev/net/tun
     restart: unless-stopped
+    ports:
+      - "6288:6288"   # expose resolver’s port via VPN container
 
   resolver:
     build: .
     depends_on:
       - nordvpn
-    network_mode: "service:nordvpn"   # route all traffic through VPN
+    network_mode: "service:nordvpn"
     environment:
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-    ports:
-      - "6288:6288"
     restart: unless-stopped
