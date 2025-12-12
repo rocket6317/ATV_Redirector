@@ -7,7 +7,10 @@ def get_atv_url():
         browser = p.chromium.launch(
             headless=True,
             args=[
-                "--use-gl=swiftshader",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-software-rasterizer",
                 "--autoplay-policy=no-user-gesture-required",
                 "--disable-blink-features=AutomationControlled"
             ]
@@ -24,7 +27,7 @@ def get_atv_url():
 
         final_url = None
 
-        # Log every request
+        # Log every request and response
         page.on("request", lambda req: print(f"[resolver] Request: {req.method} {req.url}"))
         page.on("response", lambda resp: print(f"[resolver] Response: {resp.url} status={resp.status}"))
 
