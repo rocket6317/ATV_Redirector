@@ -1,20 +1,27 @@
-from flask import Flask, redirect
-from resolver import get_atv_url
-import sys
+from flask import Flask, Response
+from resolver import get_atv_urls
 
 app = Flask(__name__)
 
 @app.route("/atv")
 def atv():
-    print("[app] /atv endpoint called", file=sys.stdout, flush=True)
-    url = get_atv_url()
-    if url:
-        print(f"[app] Redirecting to {url}", file=sys.stdout, flush=True)
-        return redirect(url, code=302)
-    print("[app] Failed to resolve ATV stream", file=sys.stderr, flush=True)
-    return "Failed to resolve ATV stream", 500
+    urls = get_atv_urls()
+    if not urls:
+        return Response("No stream URLs found", status=404)
 
-@app.route("/health")
-def health():
-    print("[app] /health endpoint called", file=sys.stdout, flush=True)
-    return "OK", 200
+    # Pick the first captured URL (or filter for 1080p if you prefer)
+    stream_url = urls[-1]
+
+    # Build M3U content
+    m3u_content = f"""#EXTM3U
+#EXTINF:-1, ATV Live
+{stream_url}
+"""
+
+    return Response(
+        m3u_content,
+        mimetype="audio/x-mpegurl",
+        headers={
+            "Content-Disposition": "attachment; filename=atv.m3u"
+        }
+    )
