@@ -30,7 +30,7 @@ def get_atv_url():
 
         page.on("requestfinished", on_request_finished)
         page.goto(ATV_URL, timeout=60000)
-        page.wait_for_timeout(25000)
+        page.wait_for_timeout(30000)  # wait long enough for signed URL
         browser.close()
 
         return final_url
