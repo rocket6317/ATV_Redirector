@@ -50,4 +50,4 @@ def get_atv_url():
             print("[resolver] No signed m3u8 URL captured after timeout")
 
 if __name__ == "__main__":
-    resolve_final_cdn_url()
+    get_atv_url()
