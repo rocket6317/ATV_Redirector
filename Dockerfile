@@ -1,24 +1,22 @@
 FROM python:3.10-slim
 
-# Install system dependencies required by Playwright Chromium
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    curl wget gnupg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
-    libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 \
-    libxrandr2 libgbm1 libasound2 libxshmfence1 \
+    wget \
+    curl \
+    xvfb \
+    chromium \
+    chromium-codecs-ffmpeg-extra \
     && rm -rf /var/lib/apt/lists/*
-
-# Set Playwright browser path before install
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Chromium into /ms-playwright
-RUN python -m playwright install chromium
+# Install Playwright and browsers
+RUN pip install playwright && playwright install chromium
 
-# Copy app code
-COPY . /app
 WORKDIR /app
+COPY . .
 
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:6288", "app:app"]
