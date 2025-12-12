@@ -2,7 +2,7 @@ from playwright.sync_api import sync_playwright
 
 ATV_URL = "https://www.atv.com.tr/canli-yayin"
 
-def resolve_final_cdn_url():
+def get_atv_url():
     with sync_playwright() as p:
         # headless=True for container use; set False if you want to see the browser
         browser = p.chromium.launch(headless=True)
