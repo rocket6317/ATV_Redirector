@@ -12,11 +12,21 @@ def get_atv_url():
 
         def on_request_finished(request):
             nonlocal final_url
-            resp = request.response()
-            if resp:
+            try:
+                resp = request.response()
+                if not resp:
+                    return
                 url = resp.url
-                if ".m3u8" in url and "atv_" in url and "st=" in url and "e=" in url:
+                # Look for the fully signed playlist
+                if (
+                    ".m3u8" in url
+                    and "atv_" in url
+                    and "st=" in url
+                    and "e=" in url
+                ):
                     final_url = url
+            except Exception:
+                pass
 
         page.on("requestfinished", on_request_finished)
         page.goto(ATV_URL, timeout=60000)
