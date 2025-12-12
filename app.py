@@ -9,7 +9,7 @@ def atv():
     if not urls:
         return Response("No stream URLs found", status=404)
 
-    # Pick the first captured URL (or filter for 1080p if you prefer)
+    # Use the last captured URL (most recent)
     stream_url = urls[-1]
 
     # Build M3U content
