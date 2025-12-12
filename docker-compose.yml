@@ -15,7 +15,7 @@ services:
       - USER=${NORDVPN_USER}
       - PASS=${NORDVPN_PASS}
       - CONNECT=Turkey
-      - TECHNOLOGY=NordLynx
+      - TECHNOLOGY=OpenVPN
     restart: unless-stopped
     networks:
       - vpnnet
