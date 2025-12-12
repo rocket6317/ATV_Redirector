@@ -7,17 +7,14 @@ app = Flask(__name__)
 def atv():
     stream_url = get_atv_url()
     if not stream_url:
-        return Response("No 1080p stream URL found", status=404)
+        return Response("No stream URL found", status=404)
 
     m3u_content = f"""#EXTM3U
-#EXTINF:-1, ATV Live (1080p)
+#EXTINF:-1, ATV Live
 {stream_url}
 """
-
     return Response(
         m3u_content,
         mimetype="audio/x-mpegurl",
-        headers={
-            "Content-Disposition": "attachment; filename=atv.m3u"
-        }
+        headers={"Content-Disposition": "attachment; filename=atv.m3u"}
     )
