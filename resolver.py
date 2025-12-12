@@ -32,10 +32,6 @@ def get_atv_url():
 
         final_url = None
 
-        # Log all requests and responses
-        page.on("request", lambda req: print(f"[resolver] Request: {req.method} {req.url}"))
-        page.on("response", lambda resp: print(f"[resolver] Response: {resp.url} status={resp.status}"))
-
         def on_request_finished(request):
             try:
                 resp = request.response()
@@ -44,7 +40,6 @@ def get_atv_url():
                 url = resp.url
                 if ".m3u8" in url:
                     print("[resolver] >>> Captured m3u8 stream URL:", url)
-                    # Prefer 1080p link
                     if "1080p" in url:
                         nonlocal final_url
                         final_url = url
