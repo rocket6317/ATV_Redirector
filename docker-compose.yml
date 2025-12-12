@@ -4,18 +4,18 @@ networks:
   vpnnet:
 
 services:
-  nordvpn:
-    image: bubuntux/nordvpn:latest
+  gluetun:
+    image: qmcgaw/gluetun:latest
     cap_add:
       - NET_ADMIN
-      - NET_RAW
     devices:
       - /dev/net/tun
     environment:
-      - USER=${NORDVPN_USER}
-      - PASS=${NORDVPN_PASS}
-      - CONNECT=Turkey
-      - TECHNOLOGY=OpenVPN
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${NORDVPN_USER}
+      - OPENVPN_PASSWORD=${NORDVPN_PASS}
+      - SERVER_COUNTRIES=Turkey
     restart: unless-stopped
     networks:
       - vpnnet
@@ -23,7 +23,7 @@ services:
   resolver:
     build: .
     depends_on:
-      - nordvpn
+      - gluetun
     environment:
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
     ports:
